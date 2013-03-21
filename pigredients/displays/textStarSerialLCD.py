@@ -89,5 +89,5 @@ class Display():
         self.threaded_runner.start()
 
     def stop(self):
-        print "Display stop called"
+        print("Display stop called")
         self._run = False

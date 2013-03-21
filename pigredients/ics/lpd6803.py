@@ -14,7 +14,7 @@ class LPD6803_Chain(object):
         self.ics = {}
         
         for ic in range(self.number_of_ics):
-            self.ics[ic] = { 'R' : 0 , 'G' : 0, 'B' : 0}
+            self.ics[ic] = { 'R' : 0 , 'G' : 0, 'B' : 0, 'lumi' : 0 }
         
 		#Write out the current zero'd state to the chain.
         self.write()       
@@ -63,9 +63,10 @@ class LPD6803_Chain(object):
         return self.write()
 
     def print_ics(self):
-        print self.ics
+        print(self.ics)
                 
-    def set_ic(self, ic_id, rgb_value=[]):
+    def set_ic(self, ic_id, rgb_value=[], lumi=100):
+		# if not given a luminance value, default to 100%
         # Check we've been given a valid rgb_value.
         if ic_id > self.number_of_ics -1:
             raise Exception("Invalid ic_id : ic_id given is greater than the number number of ics in the chain.")
@@ -76,15 +77,15 @@ class LPD6803_Chain(object):
         try:
 			# Null op to ensure we've been given an integer.
             int(ic_id)
-            self.ics[ic_id]= {'R' : rgb_value[0], 'G' : rgb_value[1], 'B' : rgb_value[2]} 
+            self.ics[ic_id]= {'R' : rgb_value[0], 'G' : rgb_value[1], 'B' : rgb_value[2], 'lumi' : lumi} 
         except ValueError:
             raise Exception("Pin number is not a valid integer.")    
                     
-    def set_rgb(self, rgb_value):
+    def set_rgb(self, rgb_value, lumi=100):
         if len(rgb_value) != 3:
             raise Exception("Invalid rgb_value: %s, please pass a list containing three state values eg. [255,255,255]" % rgb_value)
         for ic in range(self.number_of_ics):
-             self.ics[ic] = {'R' : rgb_value[0], 'G' : rgb_value[1], 'B' : rgb_value[2]}
+             self.ics[ic] = {'R' : rgb_value[0], 'G' : rgb_value[1], 'B' : rgb_value[2], 'lumi' : lumi}
  
             
     def all_on(self):
@@ -123,25 +124,25 @@ class LPD6803_Chain(object):
             append_pulses.append(0)
         self.spi.xfer2(append_pulses)
         
-    def set_white(self):
+    def set_white(self, lumi=100):
         for ic in range(self.number_of_ics):
-             self.ics[ic] = {'R' : 255, 'G' : 255, 'B' : 255}
+             self.ics[ic] = {'R' : 255, 'G' : 255, 'B' : 255, 'lumi' : lumi}
 
-    def set_red(self):
+    def set_red(self, lumi=100):
         for ic in range(self.number_of_ics):
-             self.ics[ic] = {'R' : 255, 'G' : 0, 'B' : 0}
+             self.ics[ic] = {'R' : 255, 'G' : 0, 'B' : 0, 'lumi' : lumi}
              
-    def set_green(self):
+    def set_green(self, lumi=100):
         for ic in range(self.number_of_ics):
-             self.ics[ic] = {'R' : 0, 'G' : 255, 'B' : 0}
+             self.ics[ic] = {'R' : 0, 'G' : 255, 'B' : 0, 'lumi' : lumi}
                           
-    def set_blue(self):
+    def set_blue(self, lumi=100):
         for ic in range(self.number_of_ics):
-             self.ics[ic] = {'R' : 0, 'G' : 0, 'B' : 255}
+             self.ics[ic] = {'R' : 0, 'G' : 0, 'B' : 255, 'lumi' : lumi}
                      
     def set_off(self):
         for ic in range(self.number_of_ics):
-             self.ics[ic] = {'R' : 0, 'G' : 0, 'B' : 0}
+             self.ics[ic] = {'R' : 0, 'G' : 0, 'B' : 0, 'lumi' : 0}
 
     def all_random(self):
         byte_list = []
@@ -166,6 +167,7 @@ class LPD6803_Chain(object):
             self.ics[ic]['R'] = random.randint(0,255)
             self.ics[ic]['G'] = random.randint(0,255)
             self.ics[ic]['B'] = random.randint(0,255)
+            self.ics[ic]['lumi'] = 100
                     
         for i in range(512):            
             for ic in range(self.number_of_ics):
